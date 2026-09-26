@@ -1,0 +1,179 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #121315;
+  --color-ink-2: #191b1e;
+  --color-ink-3: #22252a;
+  --color-ink-4: #2e3238;
+  --color-graphite: #5a5751;
+  --color-concrete: #8f8b83;
+  --color-concrete-300: #b9b4aa;
+  --color-concrete-200: #d6d1c6;
+  --color-bone: #e9e4d9;
+  --color-paper: #f4f1ea;
+  --color-chalk: #fbfaf6;
+  --color-steel: #46596c;
+  --color-steel-400: #6e8398;
+  --color-steel-300: #9fb1c2;
+  --color-rust: #bf4a16;
+  --color-rust-600: #a33e12;
+  --color-rust-300: #ef8a52;
+  --color-error: #b3261e;
+  --color-error-300: #ff9a8f;
+
+  --ease-build: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@theme inline {
+  --font-display: var(--font-barlow), "Arial Narrow", sans-serif;
+  --font-sans: var(--font-plex), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "ss02";
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Single-column grids shrink with the viewport instead of growing to min-content. */
+  :where(.grid) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  ::selection {
+    background: var(--color-rust);
+    color: #fff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-rust);
+    outline-offset: 3px;
+  }
+
+  [data-surface="dark"] :focus-visible {
+    outline-color: var(--color-rust-300);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .shell {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 90rem;
+    padding-inline: 1.25rem;
+  }
+  @media (min-width: 640px) {
+    .shell {
+      padding-inline: 2rem;
+    }
+  }
+  @media (min-width: 1024px) {
+    .shell {
+      padding-inline: 3rem;
+    }
+  }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 1rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .display {
+    font-family: var(--font-display);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: -0.005em;
+    line-height: 0.92;
+  }
+
+  /* Architectural drafting grid behind dark sections */
+  .drafting-grid {
+    background-image:
+      linear-gradient(to right, rgb(255 255 255 / 0.045) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(255 255 255 / 0.03) 1px, transparent 1px);
+    background-size: 8rem 8rem;
+    mask-image: linear-gradient(to bottom, #000 0%, #000 60%, transparent 100%);
+  }
+
+  .drafting-grid-light {
+    background-image:
+      linear-gradient(to right, rgb(18 19 21 / 0.05) 1px, transparent 1px),
+      linear-gradient(to bottom, rgb(18 19 21 / 0.035) 1px, transparent 1px);
+    background-size: 8rem 8rem;
+  }
+
+  /* Fine paper grain for light surfaces */
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.35;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.45 0 0 0 0 0.42 0 0 0 0 0.38 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .text-outline {
+    color: transparent;
+    -webkit-text-stroke: 1px var(--color-concrete);
+  }
+}
+
+/* Scroll reveal: only hidden when JS is running and motion is allowed. */
+@media (prefers-reduced-motion: no-preference) {
+  html.js [data-reveal] {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+    transition:
+      opacity 0.8s var(--ease-build),
+      transform 0.8s var(--ease-build);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+  html.js [data-reveal].is-revealed {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, -8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.menu-panel:not([hidden]) {
+  animation: menu-in 0.35s var(--ease-build);
+}
